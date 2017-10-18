@@ -291,10 +291,6 @@ void main() {
 		vector<cv::Mat> afterimg_array;
 		vector<int> people_index, p1, p2;
 		int count = 0;
-		bool first_frame = true;
-		bool people_flag = false;
-		bool pyo = false;
-
 		
 		while (1) {
 			depth.setRGB(rgb_img);
@@ -315,35 +311,34 @@ void main() {
 					else{
 						depth.setOneBodyDepth(p1);
 						depth.setOneNormalizeDepth(depth.bodyOneDepthImage, p1);
-						people.setPicture(depth.normalizeOneDepthImage);
+						depth.setContour(depth.normalizeOneDepthImage);
+						people.setPicture(depth.contourImage);
 					}
 				}
 				else {
 					p2.resize(people_index.size());
-					if (countPeople(people_index) == 2){
-						pyo = true;
-					}
 					makeP2(people_index, p1, p2);
 
 					if (peopleEmpty(p2)) {
-						people.createVideo();
+						people.createVideo(count++);
 						p1.clear();
 						p1.shrink_to_fit();
 					}
 					else {
 						depth.setOneBodyDepth(p2);
 						depth.setOneNormalizeDepth(depth.bodyOneDepthImage, p2);
-						people.setPicture(depth.normalizeOneDepthImage);
-						cv::imshow("RESULT IMAGE", depth.normalizeOneDepthImage);
+						depth.setContour(depth.normalizeOneDepthImage);
+						people.setPicture(depth.contourImage);
+						cv::imshow("RESULT IMAGE", depth.contourImage);
 					}
 					p2.clear();
 					p2.shrink_to_fit();
 				}
 			}
 			else if (people.hasPics()){
-				cv::Mat white_pic = cv::Mat(depth.depthHeight, depth.depthWidth, CV_8UC1, cv::Scalar(255, 255, 255));
+				cv::Mat white_pic = cv::Mat(depth.depthHeight, depth.depthWidth, CV_8UC1, cv::Scalar(0, 0, 0));
 				people.setPicture(white_pic);
-				people.createVideo();
+				people.createVideo(count++);
 				if (!p1.empty()){
 					p1.clear();
 					p1.shrink_to_fit();
@@ -354,27 +349,6 @@ void main() {
 				}
 			}
 
-			/*if (!people_flag){
-				if (peopleEmpty(people_index)){
-					people_flag = depth.findPeople(count, people_index);
-				}
-			}
-			if (people_flag) {
-				if (!depth.findPeopleIndex(people_index)) {
-					people.createVideo();
-					people_index.clear();
-					people_index.shrink_to_fit();
-				}
-				else{
-					depth.setOneBodyDepth(people_index);
-					depth.setOneNormalizeDepth(depth.bodyOneDepthImage, people_index);
-					people.setPicture(depth.normalizeOneDepthImage);
-					first_frame = false;
-				}
-				cv::imshow("RESULT IMAGE", depth.normalizeOneDepthImage);
-			}*/
-			
-			count++;
 			auto key = cv::waitKey(20);
 			if (key == 'q') break;
 		}
