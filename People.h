@@ -20,6 +20,7 @@ public:
 	void createVideo(int num){
 		tm newTime;
 		__time64_t longTime;
+		srand(time(NULL));
 
 		_time64(&longTime);
 		_localtime64_s(&newTime, &longTime);
@@ -34,7 +35,8 @@ public:
 
 		int width = (*pics.begin()).cols;
 		int hight = (*pics.begin()).rows;
-		cv::VideoWriter writer("ppl_"+to_string(num)+".avi", cv::VideoWriter::fourcc('I', '4', '2', '0'), 10, cv::Size(width, hight), true);
+		int fpm = 3;
+		cv::VideoWriter writer("ppl_"+to_string(num)+".avi", cv::VideoWriter::fourcc('I', '4', '2', '0'), fpm, cv::Size(width, hight), true);
 		if (!writer.isOpened()){
 			cout << "Error!! Unable to open video file for output." << endl;
 			exit(-1);
